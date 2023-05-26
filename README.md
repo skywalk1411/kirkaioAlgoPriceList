@@ -16,6 +16,7 @@ Steps:
  3) update the new `/config/config.json` file created in the `/config` folder with your database username, password, database, host, dialect and logging informations who can write in the mysql server.
  4) create the database model: `node_modules/.bin/sequelize model:generate --name Trade --attributes tradeId:integer,userAndTag:string,offered:blob,wanted:blob,status:integer,bumps:integer`
  5) create the table `node_modules/.bin/sequelize db:create`
+ 6) once finished, you should have a `/config/config.json` filder and folder, a database created manually on your mysql server with a user with permission to write in that database with all the infos in that config.json file. a Trade table created in that mysql database and empty ready to receive trades.
 
 -install other nodejs packages:
 now install the reset of the nodejs packages `npm install -save axios fs mysql2 path websocket`
