@@ -14,7 +14,7 @@ let priceListConfig = {
 };
 let inventory = {};
 let maxCirculationUnit, inventoryTimer;
-const maxInInventory = ()=> {
+/*const maxInInventory = ()=> {
     let temp = null;
     for (let item in inventory) {
         if (inventory[item].Totalunits-inventory[item].Banned > temp) {
@@ -22,8 +22,8 @@ const maxInInventory = ()=> {
         }
     }
     maxCirculationUnit = temp;
-};
-const reloadInventory = () => {
+};*/
+/*const reloadInventory = () => {
   axios.get('https://curious-catnip-pea.glitch.me/fullitemquantity')
     .then(response => {
       inventory = response.data;
@@ -33,9 +33,9 @@ const reloadInventory = () => {
     .catch(error => {
       console.error(`[import] sheriff's inventory/banned error: `, error);
     });
-};
-inventoryTimer = setInterval(reloadInventory, 15 * 60 * 1000);
-reloadInventory();
+};*/
+//inventoryTimer = setInterval(reloadInventory, 15 * 60 * 1000);
+//reloadInventory();
 
 const calculateCirculationCoefficient = (itemName) => {
     const item = inventory[itemName];
@@ -114,13 +114,13 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) * item.q * adjustmentRatio;
                 let newValue;
                 if (offeredValue > wantedValue) {
-                    newValue = foundItem.Value - (priceDifference * valueRatioOffered * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value - (priceDifference * valueRatioOffered/* * calculateCirculationCoefficient(foundItem.itemName)*/ * rarityMultiplier(foundItem.rarity));
                 } else if (offeredValue < wantedValue) {
-                    newValue = foundItem.Value + (priceDifference * valueRatioOffered * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value + (priceDifference * valueRatioOffered/* * calculateCirculationCoefficient(foundItem.itemName)*/ * rarityMultiplier(foundItem.rarity));
                 } else {
                     newValue = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioOffered, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioOffered, /*'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),*/'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
@@ -133,13 +133,13 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) * item.q * adjustmentRatio;
                 let newValue;
                 if (offeredValue < wantedValue) {
-                    newValue = foundItem.Value - (priceDifference * valueRatioWanted * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value - (priceDifference * valueRatioWanted/* * calculateCirculationCoefficient(foundItem.itemName)*/ * rarityMultiplier(foundItem.rarity));
                 } else if (offeredValue > wantedValue) {
-                    newValue = foundItem.Value + (priceDifference * valueRatioWanted * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value + (priceDifference * valueRatioWanted/* * calculateCirculationCoefficient(foundItem.itemName)*/ * rarityMultiplier(foundItem.rarity));
                 } else {
                     newValue = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioWanted, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioWanted, /*'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),*/'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
