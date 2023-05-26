@@ -13,19 +13,7 @@ let priceListConfig = {
     adjustedRatio: 0.1
 };
 let inventory = {};
-let inventoryTimer;
-const reloadInventory = () => {
-  axios.get('https://curious-catnip-pea.glitch.me/fullitemquantity')
-    .then(response => {
-      inventory = response.data;
-      console.log(`[import] sheriff's inventory/banned success.`);
-    })
-    .catch(error => {
-      console.error(`[import] sheriff's inventory/banned error: `, error);
-    });
-};
-inventoryTimer = setInterval(reloadInventory, 15 * 60 * 1000);
-reloadInventory();
+let maxCirculationUnit, inventoryTimer;
 const maxInInventory = ()=> {
     let temp = null;
     for (let item in inventory) {
@@ -33,13 +21,27 @@ const maxInInventory = ()=> {
             temp = inventory[item].Totalunits-inventory[item].Banned;
         }
     }
-    return temp;
+    maxCirculationUnit = temp;
 };
+const reloadInventory = () => {
+  axios.get('https://curious-catnip-pea.glitch.me/fullitemquantity')
+    .then(response => {
+      inventory = response.data;
+      console.log(`[import] sheriff's inventory/banned success.`);
+      maxInInventory();
+    })
+    .catch(error => {
+      console.error(`[import] sheriff's inventory/banned error: `, error);
+    });
+};
+inventoryTimer = setInterval(reloadInventory, 15 * 60 * 1000);
+reloadInventory();
+
 const calculateCirculationCoefficient = (itemName) => {
     const item = inventory[itemName];
   
     if (item && item.Totalunits > item.Banned) {
-      const circulationCoefficient = (maxInInventory() / (item.Totalunits - item.Banned));
+      const circulationCoefficient = (maxCirculationUnit / (item.Totalunits - item.Banned));
       return circulationCoefficient;
     }
   
@@ -72,13 +74,13 @@ const getItemBaseValue = (rarity) => {
     };
     return baseValues[rarity] || 100;
 };
-/*const rarityMultiplier = (str) => {
+const rarityMultiplier = (str) => {
     if (str === 'C') { return 0.05; }
     else if (str === 'R') { return 0.10; }
     else if (str === 'E') { return 0.25; }
     else if (str === 'L') { return 0.50; }
     else if (str === 'M') { return 0.80; }
-};*/
+};
 const doNotAdjustItems = ['Ice','Wood','Cold','Girls band','Party','Soldiers','Golden'];
 const adjustPriceListGPT2 = (acceptedTrades) => {
     const adjustedPriceList = priceList.map(item => ({ ...item }));
@@ -112,9 +114,9 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) * item.q * adjustmentRatio;
                 let newValue;
                 if (offeredValue > wantedValue) {
-                    newValue = foundItem.Value - (priceDifference * valueRatioOffered * calculateCirculationCoefficient(item.i));
+                    newValue = foundItem.Value - (priceDifference * valueRatioOffered * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else if (offeredValue < wantedValue) {
-                    newValue = foundItem.Value + (priceDifference * valueRatioOffered * calculateCirculationCoefficient(item.i));
+                    newValue = foundItem.Value + (priceDifference * valueRatioOffered * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else {
                     newValue = foundItem.Value;
                 }
@@ -131,9 +133,9 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) * item.q * adjustmentRatio;
                 let newValue;
                 if (offeredValue < wantedValue) {
-                    newValue = foundItem.Value - (priceDifference * valueRatioWanted * calculateCirculationCoefficient(item.i));
+                    newValue = foundItem.Value - (priceDifference * valueRatioWanted * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else if (offeredValue > wantedValue) {
-                    newValue = foundItem.Value + (priceDifference * valueRatioWanted * calculateCirculationCoefficient(item.i));
+                    newValue = foundItem.Value + (priceDifference * valueRatioWanted * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else {
                     newValue = foundItem.Value;
                 }
