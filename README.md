@@ -7,7 +7,7 @@ P.S.: Sorry the installation is janky.
 Requirements:
 - Nodejs
 - mySQL
-- a mySQL username created with permission to write in a database name of your chosing. 
+- a mySQL username created with permission to write/* in a database name of your chosing. 
 
 Steps:
 
