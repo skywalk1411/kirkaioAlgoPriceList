@@ -2,6 +2,8 @@
 
 Installation:
 
+P.S.: Sorry the installation is janky.
+
 Requirements:
 - Nodejs
 - mySQL
