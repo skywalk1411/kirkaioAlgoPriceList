@@ -25,7 +25,7 @@ const reloadInventory = () => {
             inventory = response.data;
             console.log(`[import] sheriff's inventory/banned success.`);
             maxInInventory();
-            adjustPriceListGPT2(testTrade1);
+            adjustPriceListGPT2(testTrade2);
         })
         .catch(error => {
             console.error(`[import] sheriff's inventory/banned error: `, error);
