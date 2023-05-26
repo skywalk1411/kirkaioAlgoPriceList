@@ -25,7 +25,7 @@ const reloadInventory = () => {
             inventory = response.data;
             console.log(`[import] sheriff's inventory/banned success.`);
             maxInInventory();
-            adjustPriceListGPT2(testTrade4);
+            adjustPriceListGPT2(testTrade5);
         })
         .catch(error => {
             console.error(`[import] sheriff's inventory/banned error: `, error);
@@ -33,12 +33,10 @@ const reloadInventory = () => {
 };
 const calculateCirculationCoefficient = (itemName) => {
     const item = inventory[itemName];
-
     if (item && item.Totalunits > item.Banned) {
         const circulationCoefficient = (maxCirculationUnit / (item.Totalunits - item.Banned));
         return circulationCoefficient/2;
     }
-
     return ((maxCirculationUnit / 5)/2);
 };
 const testTrade1 = {
@@ -48,6 +46,10 @@ const testTrade1 = {
 const testTrade2 = {
     itemsOffered : [{"i":"Caring","r":"M","q":"1"},{"i":"Mossy","r":"M","q":"1"}],
     itemsWanted : [{"i":"Basketcase","r":"M","q":"1"}],
+};
+const testTrade5 = {
+    itemsOffered : [{"i":"Caring","r":"M","q":"1"},{"i":"Mossy","r":"M","q":"1"}],
+    itemsWanted : [{"i":"Basketcase","r":"M","q":"1"},{"i":"Elmoo","r": "C","q":"6000"}],
 };
 const testTrade3 = {
     itemsOffered : [{"i":"Gold","r":"M","q":"1"}],
@@ -80,42 +82,40 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
     const adjustedPriceList = priceList.map(item => ({ ...item }));
     let offeredValue = 0;
     let wantedValue = 0;
-    let offeredItems, wantedItems;
     for (const item of acceptedTrades.itemsOffered) {
         const foundItem = adjustedPriceList.find(i => i.itemName === item.i);
         if (foundItem) {
-            offeredItems = foundItem;
             offeredValue += (foundItem.Value || getItemBaseValue(item.r)) * item.q;
         }
     }
     for (const item of acceptedTrades.itemsWanted) {
         const foundItem = adjustedPriceList.find(i => i.itemName === item.i);
         if (foundItem) {
-            wantedItems = foundItem;
             wantedValue += (foundItem.Value || getItemBaseValue(item.r)) * item.q;
         }
     }
     const valueDifferenceRatioOffered = Math.abs(offeredValue - wantedValue) / Math.max(offeredValue, wantedValue);
     const valueDifferenceRatioWanted = Math.abs(wantedValue - offeredValue) / Math.max(wantedValue, offeredValue);
-    console.log(offeredValue, wantedValue, Math.abs(offeredValue - wantedValue) / Math.max(offeredValue, wantedValue),Math.abs(wantedValue - offeredValue) / Math.max(wantedValue, offeredValue))
-    if (valueDifferenceRatioOffered < priceListConfig.valueDifferenceRatioValue && valueDifferenceRatioWanted < priceListConfig.valueDifferenceRatioValue) {
-        const valueRatioOffered = offeredValue > wantedValue ? wantedValue / offeredValue : offeredValue / wantedValue;
-        const valueRatioWanted = offeredValue > wantedValue ? wantedValue / offeredValue : offeredValue / wantedValue;
-        const adjustmentRatio = priceListConfig.adjustedRatio;
-        console.log('[tradedif] ','valueRatio', valueDifferenceRatioOffered, valueDifferenceRatioWanted, 'ratioOffered: ', valueRatioOffered, 'offered:', acceptedTrades.itemsOffered, offeredValue, 'ratioWanted:', valueRatioWanted, 'wanted:', acceptedTrades.itemsWanted, wantedValue);
+    const valueRatio = offeredValue > wantedValue ? wantedValue / offeredValue : offeredValue / wantedValue;
+    console.log(`[tradeCompare] ratio: ${valueRatio}/0.75 ${valueRatio > priceListConfig.valueDifferenceRatioValue} <offered> valueDifRatio: ${valueDifferenceRatioOffered} value: ${offeredValue} vs <wanted> valueDifRatio: ${valueDifferenceRatioWanted} value: ${wantedValue}`);
+    if (valueRatio > priceListConfig.valueDifferenceRatioValue) {
+        //const adjustmentRatio = priceListConfig.adjustedRatio;
         for (const item of acceptedTrades.itemsOffered) {
             const foundItem = adjustedPriceList.find(i => i.itemName === item.i);
             if (foundItem) {
-                const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) * item.q * adjustmentRatio;
-                let newValue;
+                const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) /** item.q */* valueDifferenceRatioOffered;
+                let newValue,newValueCoef;
                 if (offeredValue > wantedValue) {
-                    newValue = foundItem.Value - (priceDifference * valueRatioOffered * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value - (priceDifference * valueRatio * rarityMultiplier(foundItem.rarity));
+                    newValueCoef = foundItem.Value - (priceDifference * valueRatio * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else if (offeredValue < wantedValue) {
-                    newValue = foundItem.Value + (priceDifference * valueRatioOffered * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value + (priceDifference * valueRatio * rarityMultiplier(foundItem.rarity));
+                    newValueCoef = foundItem.Value - (priceDifference * valueRatio * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else {
                     newValue = foundItem.Value;
+                    newValueCoef = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioOffered, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log(`[pricechange] <offered> i:${foundItem.itemName} r:${foundItem.rarity} old:${foundItem.Value} x${item.q} math: ${foundItem.Value}${(offeredValue > wantedValue)? '-': (offeredValue<wantedValue)? '+':`=${foundItem.Value}.;`} (${priceDifference} * ${valueRatio} * ${rarityMultiplier(foundItem.rarity)}) = newValue ${Math.round(Math.max(0, newValue))} circulCoeff: ${calculateCirculationCoefficient(foundItem.itemName)} newValueCoef: ${newValueCoef}`);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
@@ -125,25 +125,25 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
         for (const item of acceptedTrades.itemsWanted) {
             const foundItem = adjustedPriceList.find(i => i.itemName === item.i);
             if (foundItem) {
-                const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) * item.q * adjustmentRatio;
-                let newValue;
+                const priceDifference = (foundItem.Value || getItemBaseValue(item.r)) /** item.q */* valueDifferenceRatioWanted;
+                let newValue,newValueCoef;
                 if (offeredValue < wantedValue) {
-                    newValue = foundItem.Value - (priceDifference * valueRatioWanted * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value - (priceDifference * valueRatio/* * calculateCirculationCoefficient(foundItem.itemName) */* rarityMultiplier(foundItem.rarity));
+                    newValueCoef = foundItem.Value - (priceDifference * valueRatio * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else if (offeredValue > wantedValue) {
-                    newValue = foundItem.Value + (priceDifference * valueRatioWanted * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
+                    newValue = foundItem.Value + (priceDifference * valueRatio/* * calculateCirculationCoefficient(foundItem.itemName) */* rarityMultiplier(foundItem.rarity));
+                    newValueCoef = foundItem.Value + (priceDifference * valueRatio * calculateCirculationCoefficient(foundItem.itemName) * rarityMultiplier(foundItem.rarity));
                 } else {
                     newValue = foundItem.Value;
+                    newValueCoef = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioWanted, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log(`[pricechange] <offered> i:${foundItem.itemName} r:${foundItem.rarity} old:${foundItem.Value} x${item.q} math: ${foundItem.Value}${(offeredValue < wantedValue)? '-': (offeredValue>wantedValue)? '+':`=${foundItem.Value}.;`} (${priceDifference} * ${valueRatio} * ${rarityMultiplier(foundItem.rarity)}) = newValue ${Math.round(Math.max(0, newValue))} circulCoeff: ${calculateCirculationCoefficient(foundItem.itemName)} newValueCoef: ${newValueCoef}`);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
                 }
             }
         }
-        //priceListConfig.modified = 1;
-        //priceList = adjustedPriceList;
     }
 };
-//adjustPriceListGPT2(testTrade3);
-reloadInventory()
+reloadInventory();
