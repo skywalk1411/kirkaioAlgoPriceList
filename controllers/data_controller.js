@@ -45,7 +45,7 @@ const calculateCirculationCoefficient = (itemName) => {
       return circulationCoefficient;
     }
   
-    return 1;
+    return (maxCirculationUnit / 5);
   };
 const exportToJsonFile = (data, filename) => {
     try {
@@ -120,7 +120,7 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 } else {
                     newValue = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioOffered, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
@@ -139,7 +139,7 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 } else {
                     newValue = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioWanted, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
