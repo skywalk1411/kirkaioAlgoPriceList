@@ -25,7 +25,7 @@ const reloadInventory = () => {
             inventory = response.data;
             console.log(`[import] sheriff's inventory/banned success.`);
             maxInInventory();
-            adjustPriceListGPT2(testTrade5);
+            adjustPriceListGPT2(testTrade3);
         })
         .catch(error => {
             console.error(`[import] sheriff's inventory/banned error: `, error);
@@ -35,9 +35,11 @@ const calculateCirculationCoefficient = (itemName) => {
     const item = inventory[itemName];
     if (item && item.Totalunits > item.Banned) {
         const circulationCoefficient = (maxCirculationUnit / (item.Totalunits - item.Banned));
-        return circulationCoefficient/2;
+        console.log(`[coeff] ${itemName} ${item.Totalunits} ${item.Banned} coeff: ${circulationCoefficient/2} or ${circulationCoefficient/100}`);
+        return circulationCoefficient/100;
     }
-    return ((maxCirculationUnit / 5)/2);
+    console.log(`[coeff] ${itemName} ? ? coeff: ${(maxCirculationUnit / 100)/2} or ${(maxCirculationUnit / 100)/100}`)
+    return ((maxCirculationUnit / 100)/100);
 };
 const testTrade1 = {
     itemsOffered : [{"i":"Hologram","r":"M","q":"1"}],
