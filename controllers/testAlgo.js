@@ -25,7 +25,7 @@ const reloadInventory = () => {
             inventory = response.data;
             console.log(`[import] sheriff's inventory/banned success.`);
             maxInInventory();
-            adjustPriceListGPT2(testTrade2);
+            adjustPriceListGPT2(testTrade4);
         })
         .catch(error => {
             console.error(`[import] sheriff's inventory/banned error: `, error);
@@ -36,10 +36,10 @@ const calculateCirculationCoefficient = (itemName) => {
 
     if (item && item.Totalunits > item.Banned) {
         const circulationCoefficient = (maxCirculationUnit / (item.Totalunits - item.Banned));
-        return circulationCoefficient;
+        return circulationCoefficient/2;
     }
 
-    return (maxCirculationUnit / 5);
+    return ((maxCirculationUnit / 5)/2);
 };
 const testTrade1 = {
     itemsOffered : [{"i":"Hologram","r":"M","q":"1"}],
@@ -52,6 +52,10 @@ const testTrade2 = {
 const testTrade3 = {
     itemsOffered : [{"i":"Gold","r":"M","q":"1"}],
     itemsWanted : [{"i":"Legend","r":"M","q":"1"}],
+};
+const testTrade4 = {
+    itemsOffered : [{"i":"Vivid","r":"M","q":"1"},{"i":"Jap","r":"M","q":"1"}],
+    itemsWanted : [{"i":"Maksim","r":"M","q":"1"},{"i":"Orbit","r":"M","q":"1"}],
 };
 const getItemBaseValue = (rarity) => {
     const baseValues = {
@@ -72,6 +76,7 @@ const rarityMultiplier = (str) => {
 };
 const doNotAdjustItems = ['Ice','Wood','Cold','Girls band','Party','Soldiers','Golden'];
 const adjustPriceListGPT2 = (acceptedTrades) => {
+    console.log(acceptedTrades)
     const adjustedPriceList = priceList.map(item => ({ ...item }));
     let offeredValue = 0;
     let wantedValue = 0;
@@ -92,6 +97,7 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
     }
     const valueDifferenceRatioOffered = Math.abs(offeredValue - wantedValue) / Math.max(offeredValue, wantedValue);
     const valueDifferenceRatioWanted = Math.abs(wantedValue - offeredValue) / Math.max(wantedValue, offeredValue);
+    console.log(offeredValue, wantedValue, Math.abs(offeredValue - wantedValue) / Math.max(offeredValue, wantedValue),Math.abs(wantedValue - offeredValue) / Math.max(wantedValue, offeredValue))
     if (valueDifferenceRatioOffered < priceListConfig.valueDifferenceRatioValue && valueDifferenceRatioWanted < priceListConfig.valueDifferenceRatioValue) {
         const valueRatioOffered = offeredValue > wantedValue ? wantedValue / offeredValue : offeredValue / wantedValue;
         const valueRatioWanted = offeredValue > wantedValue ? wantedValue / offeredValue : offeredValue / wantedValue;
