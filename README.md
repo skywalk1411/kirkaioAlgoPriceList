@@ -33,6 +33,16 @@ now install the reset of the nodejs packages `npm install -save axios fs mysql2 
  4) run `node /controllers/makeItemPriceList.js`
  5) it should generate a json file in `/controllers/baseListNew.json`. the bot need that file.
 
+-test the algo
+ inside `/controllers` run `node testAlgo.js` and you should have output of something like :
+ 
+```
+[tradedif]  valueRatio 0.651621819006539 0.651621819006539 ratioOffered:  0.3483781809934609 offered: [ { i: 'Caring', r: 'M', q: '1' }, { i: 'Mossy', r: 'M', q: '1' } ] 1181667 ratioWanted: 0.3483781809934609 wanted: [ { i: 'Basketcase', r: 'M', q: '1' } ] 411667
+[pricechange]  { itemName: 'Caring', Value: 1000000, rarity: 'M' } dif 100000 new 972130 old 1000000
+[pricechange]  { itemName: 'Mossy', Value: 181667, rarity: 'L' } dif 18166.7 new 178503 old 181667
+[pricechange]  { itemName: 'Basketcase', Value: 411667, rarity: 'M' } dif 41166.700000000004 new 423140 old 411667
+```
+
 -run the bot
  inside `/controllers` folder, run `node tracker.js`
 
