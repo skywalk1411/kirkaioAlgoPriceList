@@ -1,5 +1,9 @@
 # kirkaioAlgoPriceList
 
+Demo:
+
+https://kirka.lukeskywalk.com/pricelist.html
+
 Installation:
 
 P.S.: Sorry the installation is janky.
