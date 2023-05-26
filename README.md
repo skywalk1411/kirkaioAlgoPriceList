@@ -19,7 +19,8 @@ Steps:
 now install the reset of the nodejs packages `npm install -save axios fs mysql2 path websocket`
 
 -copy this cloned git repo into the same folder where you initialized the database.
-extract the content of this repo into the root of that nodejs folder you initialized the database from.
+ 1) extract the content of this repo into the root of that nodejs folder you initialized the database from.
+ 2) update the variable `config.url` in `/controllers/tracker.js` with your kirka.io global chat websocket mirror ws://host:port or uncomment the kirka.io url accordingly.
 
 -prepare the base pricelist
  1) save the output of `https://curious-catnip-pea.glitch.me/ItemListv2` json into `/controllers/items.json`
