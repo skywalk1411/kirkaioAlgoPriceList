@@ -25,7 +25,7 @@ const reloadInventory = () => {
             inventory = response.data;
             console.log(`[import] sheriff's inventory/banned success.`);
             maxInInventory();
-            adjustPriceListGPT2(testTrade3);
+            adjustPriceListGPT2(testTrade6);
         })
         .catch(error => {
             console.error(`[import] sheriff's inventory/banned error: `, error);
@@ -49,10 +49,6 @@ const testTrade2 = {
     itemsOffered : [{"i":"Caring","r":"M","q":"1"},{"i":"Mossy","r":"M","q":"1"}],
     itemsWanted : [{"i":"Basketcase","r":"M","q":"1"}],
 };
-const testTrade5 = {
-    itemsOffered : [{"i":"Caring","r":"M","q":"1"},{"i":"Mossy","r":"M","q":"1"}],
-    itemsWanted : [{"i":"Basketcase","r":"M","q":"1"},{"i":"Elmoo","r": "C","q":"6000"}],
-};
 const testTrade3 = {
     itemsOffered : [{"i":"Gold","r":"M","q":"1"}],
     itemsWanted : [{"i":"Legend","r":"M","q":"1"}],
@@ -60,6 +56,14 @@ const testTrade3 = {
 const testTrade4 = {
     itemsOffered : [{"i":"Vivid","r":"M","q":"1"},{"i":"Jap","r":"M","q":"1"}],
     itemsWanted : [{"i":"Maksim","r":"M","q":"1"},{"i":"Orbit","r":"M","q":"1"}],
+};
+const testTrade5 = {
+    itemsOffered : [{"i":"Caring","r":"M","q":"1"},{"i":"Mossy","r":"M","q":"1"}],
+    itemsWanted : [{"i":"Basketcase","r":"M","q":"1"},{"i":"Elmoo","r": "C","q":"6000"}],
+};
+const testTrade6 = {
+    itemsOffered : [{"i":"Or","r":"M","q":"2"},{"i":"Shard","r":"M","q":"1"},{"i":"Glance","r":"M","q":"1"}],
+    itemsWanted : [{"i":"Retro","r":"M","q":"1"}],
 };
 const getItemBaseValue = (rarity) => {
     const baseValues = {
@@ -139,7 +143,7 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                     newValue = foundItem.Value;
                     newValueCoef = foundItem.Value;
                 }
-                console.log(`[pricechange] <offered> i:${foundItem.itemName} r:${foundItem.rarity} old:${foundItem.Value} x${item.q} math: ${foundItem.Value}${(offeredValue < wantedValue)? '-': (offeredValue>wantedValue)? '+':`=${foundItem.Value}.;`} (${priceDifference} * ${valueRatio} * ${rarityMultiplier(foundItem.rarity)}) = newValue ${Math.round(Math.max(0, newValue))} circulCoeff: ${calculateCirculationCoefficient(foundItem.itemName)} newValueCoef: ${newValueCoef}`);
+                console.log(`[pricechange] <wanted> i:${foundItem.itemName} r:${foundItem.rarity} old:${foundItem.Value} x${item.q} math: ${foundItem.Value}${(offeredValue < wantedValue)? '-': (offeredValue>wantedValue)? '+':`=${foundItem.Value}.;`} (${priceDifference} * ${valueRatio} * ${rarityMultiplier(foundItem.rarity)}) = newValue ${Math.round(Math.max(0, newValue))} circulCoeff: ${calculateCirculationCoefficient(foundItem.itemName)} newValueCoef: ${newValueCoef}`);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
