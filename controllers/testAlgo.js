@@ -8,7 +8,7 @@ let priceListConfig = {
     adjustedRatio: 0.1
 };
 let inventory = {};
-let maxCirculationUnit
+let maxCirculationUnit;
 const maxInInventory = () => {
     let temp = null;
     for (let item in inventory) {
@@ -17,6 +17,7 @@ const maxInInventory = () => {
         }
     }
     maxCirculationUnit = temp;
+    console.log(temp)
 };
 const reloadInventory = () => {
     axios.get('https://curious-catnip-pea.glitch.me/fullitemquantity')
@@ -24,6 +25,7 @@ const reloadInventory = () => {
             inventory = response.data;
             console.log(`[import] sheriff's inventory/banned success.`);
             maxInInventory();
+            adjustPriceListGPT2(testTrade1);
         })
         .catch(error => {
             console.error(`[import] sheriff's inventory/banned error: `, error);
@@ -37,15 +39,19 @@ const calculateCirculationCoefficient = (itemName) => {
         return circulationCoefficient;
     }
 
-    return 1;
+    return (maxCirculationUnit / 5);
 };
 const testTrade1 = {
-    itemsOffered : [{"i":"Ghillie","r":"M","q":"1"}],
-    itemsWanted : [{"i":"Pastel","r":"M","q":"1"}],
+    itemsOffered : [{"i":"Hologram","r":"M","q":"1"}],
+    itemsWanted : [{"i":"Sunday","r":"M","q":"1"}],
 };
 const testTrade2 = {
     itemsOffered : [{"i":"Caring","r":"M","q":"1"},{"i":"Mossy","r":"M","q":"1"}],
     itemsWanted : [{"i":"Basketcase","r":"M","q":"1"}],
+};
+const testTrade3 = {
+    itemsOffered : [{"i":"Gold","r":"M","q":"1"}],
+    itemsWanted : [{"i":"Legend","r":"M","q":"1"}],
 };
 const getItemBaseValue = (rarity) => {
     const baseValues = {
@@ -103,7 +109,7 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 } else {
                     newValue = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioOffered, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
@@ -122,16 +128,16 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                 } else {
                     newValue = foundItem.Value;
                 }
-                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
+                console.log('[pricechange] ',foundItem, 'dif', priceDifference, 'valueRatio:',valueRatioWanted, 'circulCoeff:',calculateCirculationCoefficient(foundItem.itemName),'rarityX:',rarityMultiplier(foundItem.rarity),'new', Math.round(Math.max(0, newValue)), 'old', foundItem.Value);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
                 }
             }
         }
-
         //priceListConfig.modified = 1;
         //priceList = adjustedPriceList;
     }
 };
-adjustPriceListGPT2(testTrade2);
+//adjustPriceListGPT2(testTrade3);
+reloadInventory()
