@@ -29,11 +29,12 @@ now install the reset of the nodejs packages `npm install -save axios fs mysql2 
 -prepare the base pricelist
  1) save the output of `https://curious-catnip-pea.glitch.me/ItemListv2` json into `/controllers/items.json`
  2) manually update the salePrice of Wood, Golden, Ice, Cold, Girls band, Soldiers and Party to the kirka.io default until sherrif make that change :3
- 3) run `node /controllers/makeItemPriceList.js`
- 4) it should generate a json file in `/controllers/baseListNew.json`. the bot need that file.
+ 3) update line 59 of `/controllers/makeItemPriceList.js` with your `/controllers/baseListNew.json` full path.
+ 4) run `node /controllers/makeItemPriceList.js`
+ 5) it should generate a json file in `/controllers/baseListNew.json`. the bot need that file.
 
 -run the bot
  inside `/controllers` folder, run `node tracker.js`
 
-the bot should create/update the file priceList.json, all that is left is to update/upload that file periodically onto webserver with the `pricelist.html and priceList.json`.
+the bot should create/update the file `/controllers/priceList.json`, all that is left is to update/upload that file periodically onto webserver with the `/www/pricelist.html` and `/controllers/priceList.json`.
 
