@@ -36,14 +36,15 @@ const reloadInventory = () => {
 };
 inventoryTimer = setInterval(reloadInventory, 15 * 60 * 1000);
 reloadInventory();
-
 const calculateCirculationCoefficient = (itemName) => {
     const item = inventory[itemName];
     if (item && item.Totalunits > item.Banned) {
         const circulationCoefficient = (maxCirculationUnit / (item.Totalunits - item.Banned));
-        return circulationCoefficient/2;
+        //console.log(`[coeff] ${itemName} ${item.Totalunits} ${item.Banned} coeff: ${circulationCoefficient/2} or ${circulationCoefficient/100}`);
+        return circulationCoefficient/100;
     }
-    return ((maxCirculationUnit / 5)/2);
+    console.log(`[coeffError] ${itemName} ? ? coeff: ${(maxCirculationUnit / 100)/2} or ${(maxCirculationUnit / 100)/100}`)
+    return ((maxCirculationUnit / 100)/100);
 };
 const exportToJsonFile = (data, filename) => {
     try {
