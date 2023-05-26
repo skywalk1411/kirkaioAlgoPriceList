@@ -140,7 +140,7 @@ const adjustPriceListGPT2 = (acceptedTrades) => {
                     newValue = foundItem.Value;
                     newValueCoef = foundItem.Value;
                 }
-                console.log(`[pricechange] <offered> i:${foundItem.itemName} r:${foundItem.rarity} old:${foundItem.Value} x${item.q} math: ${foundItem.Value}${(offeredValue < wantedValue)? '-': (offeredValue>wantedValue)? '+':`=${foundItem.Value}.;`} (${priceDifference} * ${valueRatio} * ${rarityMultiplier(foundItem.rarity)}) = newValue ${Math.round(Math.max(0, newValue))} circulCoeff: ${calculateCirculationCoefficient(foundItem.itemName)} newValueCoef: ${newValueCoef}`);
+                console.log(`[pricechange] <wanted> i:${foundItem.itemName} r:${foundItem.rarity} old:${foundItem.Value} x${item.q} math: ${foundItem.Value}${(offeredValue < wantedValue)? '-': (offeredValue>wantedValue)? '+':`=${foundItem.Value}.;`} (${priceDifference} * ${valueRatio} * ${rarityMultiplier(foundItem.rarity)}) = newValue ${Math.round(Math.max(0, newValue))} circulCoeff: ${calculateCirculationCoefficient(foundItem.itemName)} newValueCoef: ${newValueCoef}`);
                 if (doNotAdjustItems.indexOf(item.i) == -1) {
                     foundItem.Value = Math.round(Math.max(0, newValue));
                     foundItem.rarity = item.r;
